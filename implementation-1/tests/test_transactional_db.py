@@ -138,15 +138,20 @@ class TestKVStore(unittest.TestCase):
         def worker1():
             self.kv.begin()
             val = self.kv.get("shared_key")
-            time.sleep(0.2)  # Hold the transaction to force worker2 to wait
+            time.sleep(2)
             self.kv.set("shared_key", f"{val}_w1")
             self.kv.commit()
             results["w1_final"] = self.kv.get("shared_key")
             barrier.wait()
 
         def worker2():
-            time.sleep(0.1)  # Ensure worker1 starts and acquires lock
-            # This 'get' will block until worker1 commits and releases the lock
+            time.sleep(1)  # Ensure worker1 starts and acquires lock
+            self.kv.begin()
+
+            if self.kv.get("shared_key") == "initial":
+                self.kv.set("shared_key", "initial_w2")
+            time.sleep(5)
+            self.kv.commit()
             results["w2_read"] = self.kv.get("shared_key")
             barrier.wait()
 

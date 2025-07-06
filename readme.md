@@ -49,6 +49,8 @@ The below scenario show cases where this implementation might fail.
 ### Scenario for Race Condition
 
 
+Test `test_concurrent_transaction_isolation` tries to mock the below scenario
+
 The database starts with a single key-value pair:
 * `{'key1': 'valueA'}`
 
