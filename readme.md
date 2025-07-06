@@ -8,7 +8,7 @@ This repository has two implementations of a Thread-Safe Key-Value Store with Tr
 
 This implementation follows a **`strict serializable isolation level`**. It guarantees that concurrent transactions behave as if they were executed one after another in a specific order that also respects real-time.
 
-This is achieved by **locking the entire database store** as soon as a transaction begins and releasing the lock only when the transaction is committed or rolled back. This approach ensures that only one transaction can run at a time, preventing race conditions.
+This is achieved by **locking the entire database store** as soon as a transaction begins and releasing the lock only when the transaction is committed or rolled back. This approach ensures that only one transaction can run at a time, preventing race conditions. 
 
 ---
 
@@ -41,11 +41,10 @@ A singleton object that acts as a sentinel value to mark a key for deletion with
 
 ---
 
-## The Problem with Implementation-2: Race Conditions
+## The Problem with Implementation-2:
 
-Allowing concurrent transactions without locking can lead to issues like lost updates.
-
-
+Allowing concurrent transactions without locking the store can lead to issues like lost updates.
+The below scenario show cases where this implementation might fail.
 
 ### Scenario for Race Condition
 
@@ -77,7 +76,7 @@ The final state of the store is `{'key2': 'value2'}`. Thread A's update to `'key
 
 ---
 
-## Solutions to Race Conditions
+## Solutions to this Race Condition
 
 * **Pessimistic Locking (Implementation-1):** Lock the database store as soon as a transaction starts. A more fine-grained approach could involve locking only the specific keys a transaction intends to modify.
 
