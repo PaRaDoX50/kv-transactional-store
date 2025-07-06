@@ -83,6 +83,49 @@ class TestKVStore(unittest.TestCase):
             self.kv.rollback()
         print("PASSED")
 
+    def test_multithreaded_basic_operations(self):
+        """Test basic operations across multiple threads"""
+        results = {}
+
+        def worker(thread_id):
+            self.kv.set(f"key_{thread_id}", f"value_{thread_id}")
+            results[thread_id] = self.kv.get(f"key_{thread_id}")
+
+        threads = []
+        for i in range(5):
+            thread = threading.Thread(target=worker, args=(i,))
+            threads.append(thread)
+            thread.start()
+
+        for thread in threads:
+            thread.join()
+
+        for i in range(5):
+            self.assertEqual(results[i], f"value_{i}")
+
+    def test_multithreaded_transactions(self):
+        """Test transactions across multiple threads"""
+        results = {}
+
+        def worker(thread_id):
+            self.kv.begin()
+            self.kv.set(f"key_{thread_id}", f"value_{thread_id}")
+            time.sleep(0.1)  # Simulate some work
+            self.kv.commit()
+            results[thread_id] = self.kv.get(f"key_{thread_id}")
+
+        threads = []
+        for i in range(3):
+            thread = threading.Thread(target=worker, args=(i,))
+            threads.append(thread)
+            thread.start()
+
+        for thread in threads:
+            thread.join()
+
+        for i in range(3):
+            self.assertEqual(results[i], f"value_{i}")
+
     def test_concurrent_transaction_isolation(self):
         """
         Tests that two threads with independent transactions do not interfere.
