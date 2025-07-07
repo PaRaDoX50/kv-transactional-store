@@ -12,6 +12,11 @@ class Transaction:
         self.changes.update(changes)
 
 
+"""A class to manage a stack of transactions for each thread.
+This class uses thread-local storage to maintain a stack of transactions for each thread.
+Each transaction is represented by a Transaction object, which contains an ID, a dictionary of changes"""
+
+
 class ThreadLocalTransactionStack:
     def __init__(self):
         self._local = threading.local()

@@ -147,7 +147,6 @@ class TestKVStore(unittest.TestCase):
         def worker2():
             time.sleep(1)  # Ensure worker1 starts and acquires lock
             self.kv.begin()
-
             if self.kv.get("shared_key") == "initial":
                 self.kv.set("shared_key", "initial_w2")
             time.sleep(5)
